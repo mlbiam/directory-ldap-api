@@ -318,7 +318,12 @@ public final class DefaultEntry implements Entry
 
                 if ( attributeType == null )
                 {
-                    attributeType = schemaManager.lookupAttributeTypeRegistry( attribute.getId() );
+                    // for myvd, add new schema entry if not found
+                	try {
+                		attributeType = schemaManager.lookupAttributeTypeRegistry( attribute.getId() );
+                	} catch (LdapException e) {
+                		attributeType = addAttributeToSchema(attribute.getId(),schemaManager);
+                	}
                 }
 
                 // Create a new ServerAttribute.
@@ -339,6 +344,42 @@ public final class DefaultEntry implements Entry
             }
         }
     }
+    
+    public static AttributeType addAttributeToSchema(String attributeName,SchemaManager schemaManager) throws LdapException {
+    	String newOID = generateRandomOID(schemaManager);
+    	AttributeType at = new AttributeType(newOID);
+    	
+    	// base new attributes on uid
+    	AttributeType uidAT = schemaManager.getAttributeType("0.9.2342.19200300.100.1.1");
+    	at.setNames(attributeName);
+    	at.setSyntax(uidAT.getSyntax());
+    	at.setSingleValued(false);
+    	at.setEquality(uidAT.getEquality());
+    	
+    	at.setSubstring(uidAT.getSubstring());
+    	at.setSchemaName(uidAT.getSchemaName());
+    	at.setSpecification(uidAT.getSpecification());
+    	at.setUsage(uidAT.getUsage());
+    	
+    	LOG.warn("Creating dynamic schema entry : '{}' {}", at.getName(), at.getOid());
+    	
+    	schemaManager.add(at);
+    	return at;
+    }
+    
+    public static String generateRandomOID(SchemaManager schemaManager) {
+		String base ="1.2.840.113556.1.4.";
+		int num = (int) (Math.random() * 5000);
+		
+		StringBuffer b = new StringBuffer(base);
+		b.append(num);
+		
+		if (schemaManager.getAttributeType(b.toString()) == null ) {
+			return b.toString();
+		} else {
+			return generateRandomOID(schemaManager);
+		}
+	}
 
 
     //-------------------------------------------------------------------------

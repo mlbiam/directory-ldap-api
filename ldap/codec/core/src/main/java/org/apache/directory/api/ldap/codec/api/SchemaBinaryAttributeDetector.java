@@ -19,6 +19,7 @@
  */
 package org.apache.directory.api.ldap.codec.api;
 
+import org.apache.directory.api.ldap.model.exception.LdapNoSuchAttributeException;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.api.ldap.model.schema.LdapSyntax;
 import org.apache.directory.api.ldap.model.schema.SchemaManager;
@@ -75,16 +76,21 @@ public class SchemaBinaryAttributeDetector implements BinaryAttributeDetector
 
         if ( schemaManager != null )
         {
-            AttributeType attributeType =  schemaManager.getAttributeType( attrId );
             
-            if ( attributeType == null )
-            {
-                return false;
-            }
+	        	AttributeType attributeType =  schemaManager.getAttributeType( attrId );
+	        	if ( attributeType == null )
+	            {
+	                return false;
+	            }
+	        	
+	        	LdapSyntax ldapSyntax = attributeType.getSyntax();
+	            
+	            return ( ldapSyntax != null ) && !ldapSyntax.isHumanReadable();
             
-            LdapSyntax ldapSyntax = attributeType.getSyntax();
             
-            return ( ldapSyntax != null ) && !ldapSyntax.isHumanReadable();
+            
+            
+            
         }
 
         return false;
