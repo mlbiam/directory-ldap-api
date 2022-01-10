@@ -38,7 +38,7 @@
     </repository>
   </repositories>
 
-  <groupId>org.apache.directory.api</groupId>
+  <groupId>com.tremolosecurity.directory.api</groupId>
   <artifactId>api-parent</artifactId>
   <name>Apache Directory LDAP API</name>
   <packaging>pom</packaging>
@@ -315,10 +315,6 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
